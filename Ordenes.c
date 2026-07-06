@@ -12,6 +12,7 @@ typedef struct {
     struct Clientes clientes;
     float costoBase;
     int horasTrabajo;
+    float tarifa;
 } OrdenTrabajo;
 
 void registrarOrden(OrdenTrabajo *ordenes, int *n);
@@ -48,6 +49,7 @@ int main(){
         case 1:
             printf("Registrar orden de trabajo\n");
             registrarOrden(ListaOrdenes, &n);
+            guardarOrdenes(ListaOrdenes, n);
             break;
         case 2:
             printf("Buscar ordenes de trabajo\n");
@@ -65,7 +67,8 @@ int main(){
             leerArchivoCSV(n);
             break;
         case 5:
-            printf("Mostrar el costo total\n");
+            printf("Eliminar orden de trabajo\n");
+            
             break;
         case 6:
             printf("                 Guardando\n");
@@ -92,13 +95,15 @@ void guardarOrdenes(OrdenTrabajo *a, int n) {
     }
 
     for (int i = 0; i < n; i++) {
-        fprintf(archivo, "%d;%s;%s;%s;%.2f;%d\n",
+        fprintf(archivo, "%d,%s,%s,%s,%.2f,%d,%.2f\n",
             a[i].id, 
             a[i].clientes.nombre, 
             a[i].clientes.equipo, 
             a[i].clientes.tipoTrabajo, 
             a[i].costoBase, 
-            a[i].horasTrabajo);
+            a[i].horasTrabajo,
+            a[i].tarifa
+        );
     }
 
     fclose(archivo);
@@ -127,28 +132,6 @@ void leerArchivoCSV(int n) {
     fclose(archivo);
 }
 
-void leerCSV(){
-    FILE *archivo = fopen("ordenes.csv", "r");
-    if (archivo == NULL) {
-        printf("Error al abrir el archivo para leer las ordenes.\n");
-        return;
-    }
-
-    OrdenTrabajo ordentrabajo;
-    
-    while(fscanf(archivo, "%d;%100[^;];%100[^;];%100[^;];%f;%d\n", 
-        &ordentrabajo.id, 
-        ordentrabajo.clientes.nombre, 
-        ordentrabajo.clientes.equipo, 
-        ordentrabajo.clientes.tipoTrabajo, 
-        &ordentrabajo.costoBase, 
-        &ordentrabajo.horasTrabajo) == 6)
-        {
-        printf("%s\n", ordentrabajo.clientes.tipoTrabajo);
-        }
-    fclose(archivo);
-}
-
 void registrarOrden(OrdenTrabajo *ordenes, int *n) {
     if (*n >= 10) {
         printf("No se pueden registrar más ordenes de trabajo. Capacidad máxima alcanzada.\n");
@@ -157,7 +140,6 @@ void registrarOrden(OrdenTrabajo *ordenes, int *n) {
 
     OrdenTrabajo ordentrabajo;
     int respuesta;
-
 
         int existe; //Declaramos la variable local
         do {
@@ -170,6 +152,13 @@ void registrarOrden(OrdenTrabajo *ordenes, int *n) {
             }
 
             existeID(ordentrabajo.id, &existe); 
+
+            for (int i = 0; i < *n; i++) {
+            if (ordenes[i].id == ordentrabajo.id) {
+                existe = 1;
+                break;
+            }
+        }
 
             if (existe == 1) { 
                 printf("Error El ID %d ya se encuentra registrado. Intente con otro.\n", ordentrabajo.id);
@@ -204,6 +193,8 @@ void registrarOrden(OrdenTrabajo *ordenes, int *n) {
         if (ordentrabajo.horasTrabajo < 0) {
             printf("Error Las horas de trabajo no pueden ser negativas. Intente de nuevo: ");
         }
+
+        ordentrabajo.tarifa = ordentrabajo.horasTrabajo * ordentrabajo.costoBase; // Calcula la tarifa según las horas de trabajo
     } while (ordentrabajo.horasTrabajo < 0);
     
 
@@ -239,27 +230,34 @@ void buscarorden(OrdenTrabajo *ordenes, int n, int IDbuscar) {
     }   
 
     OrdenTrabajo ordentrabajo;
-    while(fscanf(archivo, "%d;%100[^;];%100[^;];%100[^;];%f;%d\n", 
+    int encontrado = 0;
+
+    while(fscanf(archivo, " %d,%99[^,],%99[^,],%99[^,],%f,%d,%f", 
         &ordentrabajo.id, 
         ordentrabajo.clientes.nombre, 
         ordentrabajo.clientes.equipo, 
         ordentrabajo.clientes.tipoTrabajo, 
         &ordentrabajo.costoBase, 
-        &ordentrabajo.horasTrabajo) == 6)
-        {
+        &ordentrabajo.horasTrabajo,
+        &ordentrabajo.tarifa) == 7)
+    {
         if(IDbuscar == ordentrabajo.id) {
+            printf("\n--- ORDEN ENCONTRADA ---\n");
             printf("ID: %d\n", ordentrabajo.id);
             printf("Nombre del cliente: %s\n", ordentrabajo.clientes.nombre);
             printf("Equipo del cliente: %s\n", ordentrabajo.clientes.equipo);
             printf("Tipo de trabajo: %s\n", ordentrabajo.clientes.tipoTrabajo);
             printf("Costo base: %.2f\n", ordentrabajo.costoBase);
             printf("Horas de trabajo: %d\n", ordentrabajo.horasTrabajo);
-        } else {
-            printf("Orden no encontrada.\n");
+            printf("Tarifa: %.2f\n", ordentrabajo.tarifa);
+            encontrado = 1;
+            break; // Salimos del bucle al encontrarla
         }
-        ordenes[n] = ordentrabajo;
-        n++;
-        }
+    }
+
+    if (encontrado == 0) {
+        printf("Orden no encontrada.\n");
+    }
         fclose(archivo);
 
     }
@@ -275,13 +273,14 @@ void buscarorden(OrdenTrabajo *ordenes, int n, int IDbuscar) {
     OrdenTrabajo ordentrabajo;
     *encontrado = 0; // Inicializamos asumiendo que no existe
 
-    while (fscanf(archivo, "%d;%99[^;];%99[^;];%99[^;];%f;%d\n", 
+    while (fscanf(archivo, "%d,%99[^,],%99[^,],%99[^,],%f,%d,%.2f", 
            &ordentrabajo.id, 
            ordentrabajo.clientes.nombre, 
            ordentrabajo.clientes.equipo, 
            ordentrabajo.clientes.tipoTrabajo, 
            &ordentrabajo.costoBase, 
-           &ordentrabajo.horasTrabajo) == 6) 
+           &ordentrabajo.horasTrabajo,
+           &ordentrabajo.tarifa) == 7) 
     {
         if (ordentrabajo.id == idBuscar) {
             *encontrado = 1; // Encontrado
