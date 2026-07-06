@@ -14,6 +14,7 @@ typedef struct {
     int horasTrabajo;
 } OrdenTrabajo;
 
+<<<<<<< HEAD
 void registrarOrden(OrdenTrabajo *ordenes, int *n);
 void guardarOrdenes(OrdenTrabajo *a,int n);
 void leerArchivoCSV(int n);
@@ -25,9 +26,14 @@ int main(){
     
     OrdenTrabajo ListaOrdenes[10];
 
+=======
+int main(){
+>>>>>>> 64e80fee8e238b6b3bbbac54808ce52c3a12d416
     int opcion;
     int n = 0;
     int ordenes[10];
+
+    do{
 
     do{
 
@@ -55,17 +61,25 @@ int main(){
             printf("Actualizar ordenes de trabajo\n");
             break;
         case 4:
+<<<<<<< HEAD
             printf("\n          Ordenes de trabajo\n");  
             printf("--------------------------------------\n");
             leerArchivoCSV(n);
+=======
+            printf("Ver ordenes de trabajo\n");
+>>>>>>> 64e80fee8e238b6b3bbbac54808ce52c3a12d416
             break;
         case 5:
             printf("Mostrar el costo total\n");
             break;
         case 6:
+<<<<<<< HEAD
             printf("                 Guardando\n");
             printf("--------------------------------------\n");
             guardarOrdenes(ListaOrdenes, n);
+=======
+            printf("Guardar ordenes de trabajo\n");
+>>>>>>> 64e80fee8e238b6b3bbbac54808ce52c3a12d416
             break;
         case 7:
             printf("Saliendo...\n");
@@ -77,6 +91,7 @@ int main(){
     } while(opcion != 7);  
 
     return 0;
+<<<<<<< HEAD
 }
 
 void guardarOrdenes(OrdenTrabajo *a, int n) {
@@ -204,4 +219,6 @@ void limpiarArchivo(int *n) {
     ordenes[0] = 0; // Reiniciamos el conteo de órdenes registradas
     fclose(archivo); // Lo cerramos inmediatamente
     printf("El archivo 'ordenes.csv' ha sido vaciado por completo\n");
+=======
+>>>>>>> 64e80fee8e238b6b3bbbac54808ce52c3a12d416
 }
