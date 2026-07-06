@@ -1,0 +1,1 @@
+void actualizarOrden(OrdenTrabajo *ordenes, int n, int IDactualizar);

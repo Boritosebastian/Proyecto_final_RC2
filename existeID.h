@@ -1,0 +1,1 @@
+void existeID(int idBuscar, int *encontrado, OrdenTrabajo *ordenes, int n);

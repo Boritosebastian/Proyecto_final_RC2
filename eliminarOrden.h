@@ -1,0 +1,1 @@
+void eliminarOrden(OrdenTrabajo *ordenes, int *n, int IDeliminar);

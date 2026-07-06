@@ -1,0 +1,2 @@
+
+void limpiarArchivo(int *n);
